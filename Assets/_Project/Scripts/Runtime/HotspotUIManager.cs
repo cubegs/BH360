@@ -1,5 +1,4 @@
 ﻿using DG.Tweening;
-using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -9,20 +8,16 @@ namespace BHPanorama
 {
     public class HotspotUIManager : MonoBehaviour
     {
+        [Header("Scene References")]
         [SerializeField] private HotspotManager _hotspotManager = default;
-
-        [SerializeField] private Hotspot _hotspotHome = default;
-
-        [SerializeField] private bool _menuOpen = false;
-        [SerializeField] private Button _menuButton = default;
-
         [SerializeField] private GameObject _leftHotspotButtonsContainer = default;
         [SerializeField] private GameObject _rightHotspotButtonsContainer = default;
+        [SerializeField] private Hotspot _hotspotHome = default;
 
+        [Space(10)]
+        [Header("UI Componets")]
+        [SerializeField] private Button _homeButton = default;
         [SerializeField] private TMP_Text _currentHotspotTMPText = default;
-        [SerializeField] private GameObject _hotspotButtonPrefab = default;
-
-        [SerializeField] private float _showMenuDuration = default;
 
         [SerializeField] private Button _dayButton = default;
         [SerializeField] private TMP_Text _dayTMP = default;
@@ -30,9 +25,14 @@ namespace BHPanorama
         [SerializeField] private Button _nightButton = default;
         [SerializeField] private TMP_Text _nightTMP = default;
 
+        [Space(10)]
+        [Header("General Settings")]
+        [SerializeField] private bool _isMainMenuOpen = false;
+        [SerializeField] private GameObject _hotspotButtonPrefab = default;
+        [SerializeField] private float _showMenuDuration = default;
+
         private ColorBlock _buttonActiveColors = default;
         private ColorBlock _buttonInactiveColors = default;
-
         private List<Button> _hotspotButtonList = default;
 
         public void Start()
@@ -42,7 +42,7 @@ namespace BHPanorama
 
             _hotspotButtonList = new List<Button>();
 
-            _menuButton.onClick.AddListener(MenuClickHandler);
+            _homeButton.onClick.AddListener(MenuClickHandler);
             _dayButton.onClick.AddListener(DayButtonClickHandler);
             _nightButton.onClick.AddListener(NightButtonClickHandler);
 
@@ -87,7 +87,7 @@ namespace BHPanorama
         {
             if (_hotspotManager.CanMove)
             {
-                if (_menuOpen)
+                if (_isMainMenuOpen)
                 {
                     CloseMenu();
                 }
@@ -100,11 +100,11 @@ namespace BHPanorama
 
         private void OpenMenu()
         {
-            if (!_menuOpen)
+            if (!_isMainMenuOpen)
             {
                 MessageSystem.Trigger(new StartMovingToHotspotEvent(_hotspotHome));
 
-                _menuOpen = true;
+                _isMainMenuOpen = true;
 
                 RectTransform _leftHotspotRect = _leftHotspotButtonsContainer.GetComponent<RectTransform>();
 
@@ -116,7 +116,7 @@ namespace BHPanorama
                 _rightHotspotRect.anchoredPosition = new Vector2(_rightHotspotRect.anchoredPosition.x + _rightHotspotRect.rect.width, _rightHotspotRect.anchoredPosition.y);
                 _rightHotspotRect.DOAnchorPosX(0, _showMenuDuration);
 
-                _menuButton.GetComponent<RectTransform>().DOAnchorPosY(-150f, _showMenuDuration);
+                _homeButton.GetComponent<RectTransform>().DOAnchorPosY(-150f, _showMenuDuration);
 
                 MessageSystem.Trigger(new OpenMenuEvent());
             }
@@ -124,9 +124,9 @@ namespace BHPanorama
 
         private void CloseMenu()
         {
-            if (_menuOpen)
+            if (_isMainMenuOpen)
             {
-                _menuOpen = false;
+                _isMainMenuOpen = false;
 
                 RectTransform _leftHotspotRect = _leftHotspotButtonsContainer.GetComponent<RectTransform>();
 
@@ -138,7 +138,7 @@ namespace BHPanorama
                 _rightHotspotRect.anchoredPosition = new Vector2(0f, _rightHotspotRect.anchoredPosition.y);
                 _rightHotspotRect.DOAnchorPosX(_rightHotspotRect.anchoredPosition.x + _rightHotspotRect.rect.width, _showMenuDuration);
 
-                _menuButton.GetComponent<RectTransform>().DOAnchorPosY(30f, _showMenuDuration);
+                _homeButton.GetComponent<RectTransform>().DOAnchorPosY(30f, _showMenuDuration);
 
                 MessageSystem.Trigger(new CloseMenuEvent());
             }

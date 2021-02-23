@@ -7,11 +7,14 @@ namespace BHPanorama
 {
     public class Hotspot : MonoBehaviour
     {
+        [Header("Hotspot Data")]
         [SerializeField] private int _number = default;
         [SerializeField] private string _label = default;
         [SerializeField] private Color _color = default;
         [SerializeField] private Sprite _menuSprite = default;
 
+        [Space(10)]
+        [Header("UI Components References")]
         [SerializeField] private TMP_Text _numberTMP = default;
         [SerializeField] private SpriteRenderer _hotspotSR = default;
 
@@ -20,6 +23,8 @@ namespace BHPanorama
 
         [SerializeField] private EventTrigger _spriteTrigger = default;
 
+        [Space(10)]
+        [Header("Hotspot Settings")]
         [SerializeField] private Transform _hotspotRoot = default;
         [SerializeField] private float _hotspotRotation = default;
 

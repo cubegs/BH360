@@ -7,60 +7,51 @@ namespace BHPanorama
     {
         public delegate void EventDelegate<T>(T e) where T : Message;
 
-        private static Dictionary<Type, Delegate> triggers = new Dictionary<Type, Delegate>();
+        private static Dictionary<Type, Delegate> s_TriggerDictionary = new Dictionary<Type, Delegate>();
 
         public static void Subscribe<T>(EventDelegate<T> del) where T : Message
         {
-            if (triggers.TryGetValue(typeof(T), out Delegate tempDel))
+            if (s_TriggerDictionary.TryGetValue(typeof(T), out Delegate tempDel))
             {
-                triggers[typeof(T)] = Delegate.Combine(tempDel, del);
+                s_TriggerDictionary[typeof(T)] = Delegate.Combine(tempDel, del);
             }
             else
             {
-                triggers[typeof(T)] = del;
+                s_TriggerDictionary[typeof(T)] = del;
             }
         }
 
         public static void Unsubscribe<T>(EventDelegate<T> del) where T : Message
         {
-            if (triggers.ContainsKey(typeof(T)))
+            if (s_TriggerDictionary.ContainsKey(typeof(T)))
             {
-                var currentDel = System.Delegate.Remove(triggers[typeof(T)], del);
+                var currentDel = System.Delegate.Remove(s_TriggerDictionary[typeof(T)], del);
 
                 if (currentDel == null)
                 {
-                    triggers.Remove(typeof(T));
+                    s_TriggerDictionary.Remove(typeof(T));
                 }
                 else
                 {
-                    triggers[typeof(T)] = currentDel;
+                    s_TriggerDictionary[typeof(T)] = currentDel;
                 }
             }
         }
 
         public static void Trigger(Message message)
         {
-            if (triggers.TryGetValue(message.GetType(), out Delegate del))
+            if (s_TriggerDictionary.TryGetValue(message.GetType(), out Delegate del))
             {
                 del.DynamicInvoke(message);
             }
         }
     }
 
-    public class Message
-    {
+    public class Message { }
 
-    }
+    public class OpenMenuEvent : Message { }
 
-    public class OpenMenuEvent : Message
-    {
-
-    }
-
-    public class CloseMenuEvent : Message
-    {
-
-    }
+    public class CloseMenuEvent : Message { }
 
     public class PointOfInterestOpenEvent : Message
     {

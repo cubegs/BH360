@@ -7,11 +7,15 @@ namespace BHPanorama
 {
     public class PointOfInterest : MonoBehaviour
     {
-        [SerializeField] private Hotspot[] _hotspots = default;
-
+        [Header("Scene References")]
         [SerializeField] private Canvas _poiCanvas = default;
         [SerializeField] private EventTrigger _poiTrigger = default;
         [SerializeField] private Button _poiCloseButton = default;
+
+        [Header("PointOfInterest State")]
+        [SerializeField] private Hotspot[] _hotspots = default;
+
+        [Header("Renderer Settings")]
         [SerializeField] private SpriteRenderer _poiIconSpriteRenderer = default;
 
         public Canvas PoiCanvas { get => _poiCanvas; private set => _poiCanvas = value; }

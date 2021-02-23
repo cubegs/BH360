@@ -1,33 +1,22 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace BHPanorama
 {
     public class HotspotManager : MonoBehaviour
     {
+        [Header("Scene References")]
         [SerializeField] private GameObject _hotspotContainer = default;
+        [SerializeField] private CameraController _cameraController = default;
 
+        [Header("Hotspot State")]
         [SerializeField] private Hotspot _currentHotspot = default;
         [SerializeField] private PointOfInterest[] _poiList = default;
         [SerializeField] private Hotspot[] _hotspotList = default;
-
-        [SerializeField] private CameraController _cameraController = default;
         [SerializeField] private bool _canMove = true;
 
         public Hotspot CurrentHotspot { get => _currentHotspot; set => _currentHotspot = value; }
         public bool CanMove { get => _canMove; set => _canMove = value; }
         public Hotspot[] HotspotList { get => _hotspotList; set => _hotspotList = value; }
-
-
-        private void Update()
-        {
-#if UNITY_EDITOR_WIN
-            if (CurrentHotspot != null)
-            {
-                //            CurrentHotspot.UpdateLinkedHotspots();
-            }
-#endif
-        }
 
         public void Initialize()
         {
@@ -47,21 +36,9 @@ namespace BHPanorama
             }
 
             MessageSystem.Subscribe<StartMovingToHotspotEvent>((e) => HandleStartMovingToHotspot(e.Hotspot));
-            MessageSystem.Subscribe<PointOfInterestOpenEvent>((e) => HandlePointOfInterestOpen(e.PointOfInterest));
-            MessageSystem.Subscribe<PointOfInterestCloseEvent>((e) => HandlePointOfInterestClose(e.PointOfInterest));
             MessageSystem.Subscribe<EndMovingToHotspotEvent>((e) => HandleEndMovingToHotspot());
 
             _cameraController.SetCurrentHotSpot(CurrentHotspot);
-        }
-
-        private void HandlePointOfInterestOpen(PointOfInterest pos)
-        {
-
-        }
-
-        private void HandlePointOfInterestClose(PointOfInterest poi)
-        {
-
         }
 
         private void HandleStartMovingToHotspot(Hotspot newHotspot)

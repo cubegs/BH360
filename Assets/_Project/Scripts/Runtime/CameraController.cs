@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using DG.Tweening;
-using System.Runtime.InteropServices;
-using System;
 using System.Collections;
 
 namespace BHPanorama
@@ -17,33 +15,34 @@ namespace BHPanorama
         private static extern void ScrollDown();
 #endif
 
+        [Header("Scene References")]
         [SerializeField] private HotspotManager _hotspotManager;
 
-        [SerializeField] private SpriteRenderer _cameraFadeSpriteRenderer = default;
-
-        [SerializeField] private float _mouseSensitivity = 125.0f;
-        [SerializeField] private float _clampAngle = 80.0f;
+        [Space(10)]
+        [Header("Camera Controll Settings")]
         [SerializeField] private bool _invertMouse = true;
-
-        [SerializeField] private Material _skyboxMaterial = default;
-        [SerializeField] private float fadeTime = 1f;
-
-        private float _defaultFov = 60f;
+        [SerializeField] private float _mouseSensitivity = 125.0f;
+        [SerializeField] private float _cameraClampAngle = 80.0f;
+        [SerializeField] private float _defaultFov = 60f;
         [SerializeField] private float _minFov = 20f;
         [SerializeField] private float _maxFov = 60f;
         [SerializeField] private float _zoomSensitivity = 10f;
 
-        private Camera _camera;
+        [Space(10)]
+        [Header("Renderer Settings")]
+        [SerializeField] private SpriteRenderer _cameraFadeSpriteRenderer = default;
+        [SerializeField] private Material _skyboxMaterial = default;
+        [SerializeField] private float _transitionFadeTime = 1f;
 
-        private float _rotY = 0.0f; // rotation around the up/y axis
-        private float _rotX = 0.0f; // rotation around the right/x axis
-
-        private bool _enableInput = true;
-        private bool _dayTime = true;
+        private Camera _cameraReference;
+        private float _cameraYRotation = 0.0f; // rotation around the up/y axis
+        private float _cameraXRotion = 0.0f; // rotation around the right/x axis
+        private bool _isInputEnabled = true;
+        private bool _isDayTime = true;
 
         void Start()
         {
-            _camera = GetComponent<Camera>();
+            _cameraReference = GetComponent<Camera>();
 
             _cameraFadeSpriteRenderer.color = new Color(0f, 0f, 0f, 0f);
             _cameraFadeSpriteRenderer.gameObject.SetActive(false);
@@ -55,13 +54,13 @@ namespace BHPanorama
 
         private void HandleChangeTimeEvent(bool day)
         {
-            _dayTime = day;
+            _isDayTime = day;
             ChangeTexture(_hotspotManager.CurrentHotspot);
         }
 
         private void Update()
         {
-            if (_enableInput && (Input.GetMouseButton(0) || Input.GetMouseButton(1)))
+            if (_isInputEnabled && (Input.GetMouseButton(0) || Input.GetMouseButton(1)))
             {
                 float mouseX = Input.GetAxis("Mouse X");
                 float mouseY = -Input.GetAxis("Mouse Y");
@@ -72,12 +71,12 @@ namespace BHPanorama
                     mouseY *= -1;
                 }
 
-                _rotY += mouseX * _mouseSensitivity * Time.deltaTime;
-                _rotX += mouseY * _mouseSensitivity * Time.deltaTime;
+                _cameraYRotation += mouseX * _mouseSensitivity * Time.deltaTime;
+                _cameraXRotion += mouseY * _mouseSensitivity * Time.deltaTime;
 
-                _rotX = Mathf.Clamp(_rotX, -_clampAngle, _clampAngle);
+                _cameraXRotion = Mathf.Clamp(_cameraXRotion, -_cameraClampAngle, _cameraClampAngle);
 
-                Quaternion localRotation = Quaternion.Euler(_rotX, _rotY, 0.0f);
+                Quaternion localRotation = Quaternion.Euler(_cameraXRotion, _cameraYRotation, 0.0f);
                 transform.rotation = localRotation;
             }
 
@@ -95,12 +94,12 @@ namespace BHPanorama
 
         private void HandleCloseMenu(OpenMenuEvent e)
         {
-            _enableInput = true;
+            _isInputEnabled = true;
         }
 
         private void HandleOpenMenu(OpenMenuEvent e)
         {
-            _enableInput = false;
+            _isInputEnabled = false;
         }
 
         private void Zoom()
@@ -117,13 +116,13 @@ namespace BHPanorama
             Vector3 rot = transform.localRotation.eulerAngles;
             Camera.main.fieldOfView = _defaultFov;
 
-            _rotY = rot.y;
-            _rotX = rot.x;
+            _cameraYRotation = rot.y;
+            _cameraXRotion = rot.x;
         }
 
         private void ChangeTexture(Hotspot hotspot)
         {
-            if (_dayTime)
+            if (_isDayTime)
             {
                 _skyboxMaterial.mainTexture = hotspot.HotspotTexture;
             }
@@ -162,14 +161,14 @@ namespace BHPanorama
         {
             transform.DOLookAt(targetHotspot.transform.position, 0.5f);
             yield return new WaitForSeconds(0.5f);
-            _camera.DOFieldOfView(20f, fadeTime);
+            _cameraReference.DOFieldOfView(20f, _transitionFadeTime);
             _cameraFadeSpriteRenderer.gameObject.SetActive(true);
-            _cameraFadeSpriteRenderer.DOFade(1f, fadeTime);
-            yield return new WaitForSeconds(fadeTime);
+            _cameraFadeSpriteRenderer.DOFade(1f, _transitionFadeTime);
+            yield return new WaitForSeconds(_transitionFadeTime);
             SetCurrentHotSpot(targetHotspot);
             transform.DOMove(targetHotspot.transform.position, 0f);
-            _cameraFadeSpriteRenderer.DOFade(0f, fadeTime);
-            yield return new WaitForSeconds(fadeTime);
+            _cameraFadeSpriteRenderer.DOFade(0f, _transitionFadeTime);
+            yield return new WaitForSeconds(_transitionFadeTime);
             FinishCameraTransition();
         }
     }
