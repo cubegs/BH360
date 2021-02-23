@@ -3,76 +3,79 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class PointOfInterest : MonoBehaviour
+namespace BHPanorama
 {
-    [SerializeField] private Hotspot[] _hotspots = default;
-
-    [SerializeField] private Canvas _poiCanvas = default;
-    [SerializeField] private EventTrigger _poiTrigger = default;
-    [SerializeField] private Button _poiCloseButton = default;
-    [SerializeField] private SpriteRenderer _poiIconSpriteRenderer = default;
-
-    public Canvas PoiCanvas { get => _poiCanvas; set => _poiCanvas = value; }
-    public Hotspot[] Hotspots { get => _hotspots; set => _hotspots = value; }
-
-    public void Initialize()
+    public class PointOfInterest : MonoBehaviour
     {
-        AddPointerClickTrigger();
-        _poiCloseButton.onClick.AddListener(HandlePointOfInterestCloseClick);
-        ClosePointOfInterest();
+        [SerializeField] private Hotspot[] _hotspots = default;
 
-        MessageSystem.Subscribe<EndMovingToHotspotEvent>((e) => UpdatePoiDirection());
-    }
+        [SerializeField] private Canvas _poiCanvas = default;
+        [SerializeField] private EventTrigger _poiTrigger = default;
+        [SerializeField] private Button _poiCloseButton = default;
+        [SerializeField] private SpriteRenderer _poiIconSpriteRenderer = default;
 
-    public void UpdatePoiDirection()
-    {
-        Transform target = Camera.main.transform;
-        Transform poi = _poiIconSpriteRenderer.transform;
+        public Canvas PoiCanvas { get => _poiCanvas; private set => _poiCanvas = value; }
+        public Hotspot[] Hotspots { get => _hotspots; private set => _hotspots = value; }
 
-        Vector3 canvasLookDir = transform.position - new Vector3(target.position.x, transform.position.y, target.position.z);
-
-        if (canvasLookDir != Vector3.zero)
+        public void Initialize()
         {
-            PoiCanvas.transform.rotation = Quaternion.LookRotation(canvasLookDir);
+            AddPointerClickTrigger();
+            _poiCloseButton.onClick.AddListener(HandlePointOfInterestCloseClick);
+            ClosePointOfInterest();
+
+            MessageSystem.Subscribe<EndMovingToHotspotEvent>((e) => UpdatePoiDirection());
         }
 
-        Vector3 poiLookDir = poi.position - new Vector3(target.position.x, poi.position.y, target.position.z);
-
-        if (poiLookDir != Vector3.zero)
+        public void UpdatePoiDirection()
         {
-            poi.rotation = Quaternion.LookRotation(poiLookDir);
+            Transform target = Camera.main.transform;
+            Transform poi = _poiIconSpriteRenderer.transform;
+
+            Vector3 canvasLookDir = transform.position - new Vector3(target.position.x, transform.position.y, target.position.z);
+
+            if (canvasLookDir != Vector3.zero)
+            {
+                PoiCanvas.transform.rotation = Quaternion.LookRotation(canvasLookDir);
+            }
+
+            Vector3 poiLookDir = poi.position - new Vector3(target.position.x, poi.position.y, target.position.z);
+
+            if (poiLookDir != Vector3.zero)
+            {
+                poi.rotation = Quaternion.LookRotation(poiLookDir);
+            }
         }
-    }
 
-    public void OpenPointOfInterest()
-    {
-        _poiCanvas.gameObject.SetActive(true);
+        public void OpenPointOfInterest()
+        {
+            _poiCanvas.gameObject.SetActive(true);
 
-        MessageSystem.Trigger(new PointOfInterestOpenEvent(this));
-    }
+            MessageSystem.Trigger(new PointOfInterestOpenEvent(this));
+        }
 
-    public void ClosePointOfInterest()
-    {
-        _poiCanvas.gameObject.SetActive(false);
+        public void ClosePointOfInterest()
+        {
+            _poiCanvas.gameObject.SetActive(false);
 
-        MessageSystem.Trigger(new PointOfInterestCloseEvent(this));
-    }
+            MessageSystem.Trigger(new PointOfInterestCloseEvent(this));
+        }
 
-    private void AddPointerClickTrigger()
-    {
-        EventTrigger.Entry entry = new EventTrigger.Entry();
-        entry.eventID = EventTriggerType.PointerClick;
-        entry.callback.AddListener(HandlePointOfInterestClick);
-        _poiTrigger.triggers.Add(entry);
-    }
+        private void AddPointerClickTrigger()
+        {
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerClick;
+            entry.callback.AddListener(HandlePointOfInterestClick);
+            _poiTrigger.triggers.Add(entry);
+        }
 
-    private void HandlePointOfInterestCloseClick()
-    {
-        ClosePointOfInterest();
-    }
+        private void HandlePointOfInterestCloseClick()
+        {
+            ClosePointOfInterest();
+        }
 
-    private void HandlePointOfInterestClick(BaseEventData eventData)
-    {
-        OpenPointOfInterest();
+        private void HandlePointOfInterestClick(BaseEventData eventData)
+        {
+            OpenPointOfInterest();
+        }
     }
 }

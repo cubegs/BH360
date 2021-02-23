@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HotspotSystem : MonoBehaviour
+namespace BHPanorama
 {
-    [SerializeField] private HotspotManager _hotspotManager = default;
-
-    void Start()
+    public class HotspotSystem : MonoBehaviour
     {
-        _hotspotManager.Initialize();
+        [SerializeField] private HotspotManager _hotspotManager = default;
+
+        void Start()
+        {
+            _hotspotManager.Initialize();
+        }
     }
 }

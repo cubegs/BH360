@@ -3,39 +3,42 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HotspotButton : Button
+namespace BHPanorama
 {
-    [SerializeField] private TMP_Text _label;
-    [SerializeField] private TMP_Text _number;
-    [SerializeField] private Image _icon;
-    [SerializeField] private Image _typeIcon;
-
-    [SerializeField] private Hotspot _hotspot;
-
-    public TMP_Text Label { get => _label; set => _label = value; }
-    public TMP_Text Number { get => _number; set => _number = value; }
-    public Image Icon { get => _icon; set => _icon = value; }
-    public Hotspot Hotspot { get => _hotspot; set => _hotspot = value; }
-    public Image TypeIcon { get => _typeIcon; set => _typeIcon = value; }
-
-    protected override void Start()
+    public class HotspotButton : Button
     {
-        base.Start();
+        [SerializeField] private TMP_Text _label = default;
+        [SerializeField] private TMP_Text _number = default;
+        [SerializeField] private Image _icon = default;
+        [SerializeField] private Image _typeIcon = default;
 
-        onClick.AddListener(HandleButtonClick);
-    }
+        [SerializeField] private Hotspot _hotspot = default;
 
-    private void HandleButtonClick()
-    {
-        MessageSystem.Trigger(new StartMovingToHotspotEvent(Hotspot));
-    }
+        public TMP_Text Label { get => _label; private set => _label = value; }
+        public TMP_Text Number { get => _number; private set => _number = value; }
+        public Image Icon { get => _icon; private set => _icon = value; }
+        public Hotspot Hotspot { get => _hotspot; private set => _hotspot = value; }
+        public Image TypeIcon { get => _typeIcon; private set => _typeIcon = value; }
 
-    public void SetHotspot(Hotspot hotspot)
-    {
-        Hotspot = hotspot;
-        Label.text = hotspot.Label.ToUpper();
-        Number.text = hotspot.Number.ToString();
-        Icon.color = hotspot.Color;
-        TypeIcon.sprite = hotspot.MenuSprite;
+        protected override void Start()
+        {
+            base.Start();
+
+            onClick.AddListener(HandleButtonClick);
+        }
+
+        private void HandleButtonClick()
+        {
+            MessageSystem.Trigger(new StartMovingToHotspotEvent(Hotspot));
+        }
+
+        public void SetHotspot(Hotspot hotspot)
+        {
+            Hotspot = hotspot;
+            Label.text = hotspot.Label.ToUpper();
+            Number.text = hotspot.Number.ToString();
+            Icon.color = hotspot.Color;
+            TypeIcon.sprite = hotspot.MenuSprite;
+        }
     }
 }
