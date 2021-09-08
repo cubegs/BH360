@@ -4,6 +4,8 @@ namespace BHPanorama
 {
     public class HotspotManager : MonoBehaviour
     {
+        public static bool SHOW_UI = false;
+
         [Header("Scene References")]
         [SerializeField] private GameObject _hotspotContainer = default;
         [SerializeField] private CameraController _cameraController = default;
@@ -17,6 +19,7 @@ namespace BHPanorama
         public Hotspot CurrentHotspot { get => _currentHotspot; set => _currentHotspot = value; }
         public bool CanMove { get => _canMove; set => _canMove = value; }
         public Hotspot[] HotspotList { get => _hotspotList; set => _hotspotList = value; }
+        public CameraController CameraController { get => _cameraController; set => _cameraController = value; }
 
         public void Initialize()
         {
@@ -38,7 +41,7 @@ namespace BHPanorama
             MessageSystem.Subscribe<StartMovingToHotspotEvent>((e) => HandleStartMovingToHotspot(e.Hotspot));
             MessageSystem.Subscribe<EndMovingToHotspotEvent>((e) => HandleEndMovingToHotspot());
 
-            _cameraController.SetCurrentHotSpot(CurrentHotspot);
+            CameraController.SetCurrentHotSpot(CurrentHotspot);
         }
 
         private void HandleStartMovingToHotspot(Hotspot newHotspot)
@@ -48,7 +51,7 @@ namespace BHPanorama
                 CanMove = false;
 
                 CurrentHotspot = newHotspot;
-                _cameraController.MoveTo(newHotspot);
+                CameraController.MoveTo(newHotspot);
             }
         }
 

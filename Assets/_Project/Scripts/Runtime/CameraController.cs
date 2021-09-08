@@ -7,14 +7,6 @@ namespace BHPanorama
     [RequireComponent(typeof(Camera))]
     public class CameraController : MonoBehaviour
     {
-#if !UNITY_EDITOR && UNITY_WEBGL
-        [DllImport("__Internal")]
-        private static extern void ScrollUp();
-
-        [DllImport("__Internal")]
-        private static extern void ScrollDown();
-#endif
-
         [Header("Scene References")]
         [SerializeField] private HotspotManager _hotspotManager;
 
@@ -38,7 +30,9 @@ namespace BHPanorama
         private float _cameraYRotation = 0.0f; // rotation around the up/y axis
         private float _cameraXRotion = 0.0f; // rotation around the right/x axis
         private bool _isInputEnabled = true;
-        private bool _isDayTime = true;
+        private bool _isDayTime = false;
+
+        public bool IsDayTime { get => _isDayTime; set => _isDayTime = value; }
 
         void Start()
         {
@@ -54,7 +48,7 @@ namespace BHPanorama
 
         private void HandleChangeTimeEvent(bool day)
         {
-            _isDayTime = day;
+            IsDayTime = day;
             ChangeTexture(_hotspotManager.CurrentHotspot);
         }
 
@@ -79,17 +73,6 @@ namespace BHPanorama
                 Quaternion localRotation = Quaternion.Euler(_cameraXRotion, _cameraYRotation, 0.0f);
                 transform.rotation = localRotation;
             }
-
-#if !UNITY_EDITOR && UNITY_WEBGL
-        if (Input.GetAxis("Mouse ScrollWheel") > 0)
-        {
-            ScrollUp();
-        }
-        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-        {
-            ScrollDown();
-        }
-#endif
         }
 
         private void HandleCloseMenu(OpenMenuEvent e)
@@ -100,14 +83,6 @@ namespace BHPanorama
         private void HandleOpenMenu(OpenMenuEvent e)
         {
             _isInputEnabled = false;
-        }
-
-        private void Zoom()
-        {
-            float fov = Camera.main.fieldOfView;
-            fov -= Input.GetAxis("Mouse ScrollWheel") * _zoomSensitivity;
-            fov = Mathf.Clamp(fov, _minFov, _maxFov);
-            Camera.main.fieldOfView = fov;
         }
 
         private void ResetRotation(Hotspot hotspot)
@@ -122,7 +97,7 @@ namespace BHPanorama
 
         private void ChangeTexture(Hotspot hotspot)
         {
-            if (_isDayTime)
+            if (IsDayTime)
             {
                 _skyboxMaterial.mainTexture = hotspot.HotspotTexture;
             }

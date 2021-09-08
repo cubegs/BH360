@@ -51,6 +51,11 @@ namespace BHPanorama
 
             OpenMenu();
 
+            if (!_hotspotManager.CameraController.IsDayTime)
+            {
+                NightButtonClickHandler();
+            }
+
             //        _menuHomeSprite.transform.DOScale(1.1f, 1f).SetLoops(-1, LoopType.Yoyo);
         }
 
